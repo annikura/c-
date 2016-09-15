@@ -1,7 +1,7 @@
-#include "io.h"
+#include "../include/io.h"
 
 void logDebug(char x){
-	int t = 0;
+  int t = 0;
 }
 
 int maxx(int a, int b) {
