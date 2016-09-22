@@ -7,11 +7,11 @@ size_t strlen(const char * str){
 }
 
 char * strcpy(char * destination, const char * source){
-    size_t pointer = 0;
-    while (*(source + pointer))
-        *(destination + pointer) = *(source + pointer), pointer++;
-    *(destination + pointer) = '\0';
-    return destination;
+    char * save = destination;
+    while (*source)
+        *(destination++) = *(source++);
+    *destination = '\0';
+    return save;
 }
 
 

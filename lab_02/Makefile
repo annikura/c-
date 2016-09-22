@@ -1,23 +1,23 @@
 str.o = ./bin/str.o
-tests_str.o = ./bin/tests_str.o
+test_str.o = ./bin/test_str.o
 test.o = ./bin/test.o
 
 str.h = ./include/str.h
-tests_str.h = ./include/tests_str.h
+test_str.h = ./include/test_str.h
 
 str.c = ./src/str.c
 test.c = ./src/test.c
-tests_str.c = ./src/tests_str.c
+test_str.c = ./src/test_str.c
 
 test = ./bin/test
 
 $(str.o): bin $(str.c) $(str.h)
 	gcc -c $(str.c) -o $(str.o)
-test: bin $(str.o) $(tests_str.o) $(test.o) $(test)
-	gcc $(test.o) $(str.o) $(tests.str.o) -o $(test)
-$(tests_str.o): bin $(str.o) $(tests_str.c) $(tests_str.h)
-	gcc -c  $(tests_str.c) -o $(tests_str.o)
-$(test.o): bin $(test.c) $(tests_str.o)
+$(test): $(str.o) $(test_str.o) $(test.o)
+	gcc $(test.o) $(str.o) $(test_str.o) -o $(test)
+$(test_str.o): bin $(test_str.c) $(test_str.h)
+	gcc -c  $(test_str.c) -o $(test_str.o)
+$(test.o): bin $(test.c)
 	gcc -c $(test.c) -o $(test.o)
 bin: 
 	mkdir bin
