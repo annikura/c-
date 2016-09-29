@@ -82,6 +82,7 @@ int main() {
             continue;
         }
         if (strcmp(command, "exit") == 0){
+	    remove_all_positions(&l);
             return 0;
         }
         printf("Unknown command\n");
