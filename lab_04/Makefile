@@ -6,7 +6,7 @@ mergesort.h = ./include/mergesort.h
 mergesort.o = ./bin/mergesort.o
 ms_cli.o = ./bin/ms_cli.o
 
-all: bin $(ms_cli.o) $(mergesort.o)
+ms_cli: bin $(ms_cli.o) $(mergesort.o)
 	gcc $(ms_cli.o) $(mergesort.o) -o ms_cli
 $(ms_cli.o): $(ms_cli.c)
 	gcc -c $(ms_cli.c) -o $(ms_cli.o)
