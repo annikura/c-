@@ -7,9 +7,11 @@ void copy(char *a, char *b, size_t size){
 }
 
 int mergesort (void *base, size_t num, size_t size, int (*compar)(const void* ,const void*)){
-    if (size == 1)
+    if (num == 1)
         return 0;
-    void *left = base, *mid = (char*)base + num / 2, *right = (char*)base + size;
+    void *left = base;
+    void *mid = (char*)base + (num / 2) * size;
+    void *right = (char*)base + size * num;
     mergesort(left, num / 2, size, compar);
     mergesort(mid, num - num / 2, size, compar);
     void *p1 = left, *p2 = mid;
@@ -26,7 +28,7 @@ int mergesort (void *base, size_t num, size_t size, int (*compar)(const void* ,c
         nxt = (char*)nxt + size;
     }
     void *p;
-    for (nxt = tmp, p = base; nxt != (char*)tmp + num;
+    for (nxt = tmp, p = base; nxt != (char*)tmp + num * size;
          nxt =(char*)nxt + size, p = (char*)p + size)
         copy(p, nxt, size);
     free(tmp);
