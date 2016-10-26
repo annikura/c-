@@ -40,7 +40,7 @@ std::size_t MyVector::capacity(){
 void MyVector::reserve(std::size_t new_capacity){
     if (_cp >= new_capacity)
         return;
-    _cp = new_capacity * 2;
+    _cp = new_capacity;
     TYPE * new_data = new TYPE[_cp];
     memcpy(new_data, _data, _sz * sizeof(TYPE));
     delete []_data;
@@ -48,21 +48,25 @@ void MyVector::reserve(std::size_t new_capacity){
 }
 
 void MyVector::resize(std::size_t new_size){
-    this->reserve(new_size);
-    memset(_data + _sz, 0, (new_size - _sz) * sizeof(TYPE));
+    if (new_size > _sz){
+        while (_cp < new_size)
+            _cp *= 2;
+        this->reserve(_cp);
+        memset(_data + _sz, 0, (new_size - _sz) * sizeof(TYPE));
+    }
     _sz = new_size;
 }
 
 void MyVector::push_back(TYPE value){
     if (_sz == _cp)
-        this->reserve(_cp + 1);
+        this->resize(_cp + 1);
     _data[_sz++] = value;
 }
 
 void MyVector::insert(std::size_t index, TYPE value){
     assert(index >= 0 && index <= _sz);
     if (_sz == _cp)
-        this->reserve(_cp + 1);
+        this->resize(_cp + 1);
     for (std::size_t i = _sz; i > index; i--)
         _data[i] = _data[i - 1];
     _data[index] = value;
