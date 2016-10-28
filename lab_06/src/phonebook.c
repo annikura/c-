@@ -10,6 +10,9 @@
 phonebook_t *glob_book;
 bool interrupt = true;
 
+int cmp(const void *a, const void *b){
+    return strcmp(((human_t *)a)->family_name, ((human_t *)b)->family_name);
+}
 
 void add_human(phonebook_t *book, human_t human){
     if (book->capacity == book->size){
@@ -129,6 +132,8 @@ int load_phonebook_xml(const char *filename, phonebook_t *book){
     free(buff);
     XML_ParserFree(parser);
     fclose(fp);
+
+    qsort(book->humans, book->size, sizeof(human_t), cmp);
 
 }
 
