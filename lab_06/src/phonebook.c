@@ -24,7 +24,7 @@ void add_human(phonebook_t *book, human_t human){
     book->humans[book->size++] = human;
 }
 
-void start_element(void *data, const char *element, const char **attribute){
+void start_element(void *data __attribute__((unused)), const char *element, const char **attribute){
     interrupt = true;
     if (strcmp(element, "human") == 0){
         human_t human;
@@ -55,7 +55,7 @@ void start_element(void *data, const char *element, const char **attribute){
     return;
 }
 
-void end_element(void *data, const char *element){
+void end_element(void *data __attribute__((unused)), const char *element){
     interrupt = true;
     if (strcmp(element, "human") == 0){
         return;
@@ -77,7 +77,7 @@ bool is_none(const char *str, int length){
     return true;
 }
 
-void handle_data(void *data, const char *content, int length){
+void handle_data(void *data __attribute__((unused)), const char *content, int length){
     if (is_none(content, length)){
         interrupt = true;
         return;
@@ -134,11 +134,11 @@ int load_phonebook_xml(const char *filename, phonebook_t *book){
     fclose(fp);
 
     qsort(book->humans, book->size, sizeof(human_t), cmp);
-
+    return 0;
 }
 
 int save_phonebook_xml(const char *filename, phonebook_t *book){
-    int i, j;
+    size_t i, j;
     FILE *fp = fopen(filename, "w");
 
     fprintf(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -155,10 +155,11 @@ int save_phonebook_xml(const char *filename, phonebook_t *book){
     }
     fprintf(fp, "</phonebook>\n\n");
     fclose(fp);
+    return 0;
 }
 
 void print_phonebook(phonebook_t *book){
-    int i, j;
+    size_t i, j;
 
     printf("%zu\n", book->size);
 
@@ -174,7 +175,7 @@ void print_phonebook(phonebook_t *book){
 }
 
 human_t get_random_human(){
-    int i, j;
+    size_t i, j;
 
     human_t human;
     strcpy(human.name, kNames[rand() % NAMES_CNT]);
@@ -182,7 +183,7 @@ human_t get_random_human(){
     strcpy(human.middle_name, kMiddleNames[rand() % MIDDLE_NAMES_CNT]);
     human.phone_cnt = rand() % 10;
     for (i = 0; i < human.phone_cnt; i++){
-        int len = rand() % 19 + 1;
+        size_t len = rand() % 19 + 1;
         for (j = 0; j < len; j++)
             human.phones[i][j] = rand() % 10 + '0';
         human.phones[i][len] = '\0';
@@ -191,7 +192,7 @@ human_t get_random_human(){
 }
 
 void gen_phonebook(phonebook_t *book, size_t size){
-    int i;
+    size_t i;
     clear_phonebook(book);
     for (i = 0; i < size; i++){
         human_t human = get_random_human();
@@ -212,7 +213,8 @@ void clear_phonebook(phonebook_t *book){
 }
 
 human_t get_human(phonebook_t *book, char* family_name){
-    int i;
+    size_t i;
+    human_t trash;
 
     for (i = 0; i < book->size; i++){
         human_t *pointer = &(book->humans[i]);
@@ -220,5 +222,7 @@ human_t get_human(phonebook_t *book, char* family_name){
             return *pointer;
         pointer++;
     }
+
     printf("There is no such a human with family name %s in book\n", family_name);
+    return trash;
 }

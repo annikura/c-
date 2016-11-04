@@ -1,6 +1,9 @@
 main.c = ./src/main.c
 main.o = ./bin/main.o
 
+CC = gcc
+CFLAGS = -g -I include -Wall -O3 -Wextra -Wshadow -m64
+
 phonebook.c = ./src/phonebook.c
 phonebook.o = ./bin/phonebook.o
 
@@ -10,16 +13,16 @@ names.h = ./include/names.h
 bin = $(./bin)
 
 main: bin $(main.o) $(phonebook.o)
-	gcc $(main.o) $(phonebook.o) -o main -lexpat
+	$(CC) $(main.o) $(phonebook.o) -o main -lexpat
 
 bin: $(bin)
 	mkdir bin
 
 $(phonebook.o): $(phonebook.c) $(phonebook.h) $(names.h)
-	gcc -c $(phonebook.c) -o $(phonebook.o)
+	$(CC) $(CFLAGS) -c $(phonebook.c) -o $(phonebook.o)
 
 $(main.o): $(main.c)
-	gcc -c $(main.c) -o $(main.o)
+	$(CC) $(CFLAGS) -c $(main.c) -o $(main.o)
 
 clean:
 	rm -rf bin main
