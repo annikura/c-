@@ -30,7 +30,7 @@ void start_element(void *data __attribute__((unused)), const char *element, cons
         human_t human;
         human.phone_cnt = 0;
 
-        char *tmp = (char *)malloc(strlen(attribute[1]));
+        char *tmp = (char *)malloc((strlen(attribute[1]) + 1) * sizeof(char));
         strcpy(tmp, attribute[1]);
 
         char *token = strtok(tmp, " ");
@@ -83,7 +83,7 @@ void handle_data(void *data __attribute__((unused)), const char *content, int le
         return;
     }
 
-    char *tmp = (char *)malloc(length * sizeof(char));
+    char *tmp = (char *)malloc((length + 1) * sizeof(char));
     strncpy(tmp, content, length);
     tmp[length] = '\0';
     if (interrupt){
