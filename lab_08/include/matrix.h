@@ -7,7 +7,7 @@
 class Matrix {
 public:
     Matrix(std::size_t r, std::size_t c);
-    Matrix(Matrix& m);
+    Matrix(Matrix const &m);
     ~Matrix();
 
     std::size_t get_rows();
@@ -16,18 +16,20 @@ public:
     int get(std::size_t i, std::size_t j);
     void print(FILE *f);
 
-    Matrix operator+(Matrix& m);
-    Matrix operator-(Matrix& m);
-    Matrix operator*(Matrix& m);
+    Matrix operator+(Matrix const &m);
+    Matrix operator-(Matrix const &m);
+    Matrix operator*(Matrix const &m);
 
-    Matrix& operator=(Matrix &m);
+    Matrix& operator=(Matrix const &m);
 
-    Matrix& operator+=(Matrix& m);
-    Matrix& operator-=(Matrix& m);
-    Matrix& operator*=(Matrix& m);
+    void swap(Matrix &m);
 
-    bool operator==(Matrix& m);
-    bool operator!=(Matrix& m);
+    Matrix& operator+=(Matrix const &m);
+    Matrix& operator-=(Matrix const &m);
+    Matrix& operator*=(Matrix const &m);
+
+    bool operator==(Matrix const &m);
+    bool operator!=(Matrix const &m);
 private:
     std::size_t _rows;
     std::size_t _cols;

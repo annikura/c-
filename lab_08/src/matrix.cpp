@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
+#include <algorithm>
+#include <cmath>
 #include <assert.h>
 #include <cstring>
 #include "matrix.h"
@@ -19,7 +21,7 @@ Matrix::~Matrix() {
     delete [] _data;
 }
 
-Matrix::Matrix(Matrix& m) {
+Matrix::Matrix(Matrix const &m) {
     _rows = m._rows, _cols = m._cols;
     int *tmp = new int [_rows * _cols];
     _data = new int *[_rows];
@@ -56,7 +58,7 @@ void Matrix::print(FILE* f) {
 
 }
 
-bool Matrix::operator==(Matrix& m) {
+bool Matrix::operator==(Matrix const &m) {
     if (_rows != m._rows || _cols != m._cols)
         return false;
     for (size_t i = 0; i < _rows; i++)
@@ -66,25 +68,19 @@ bool Matrix::operator==(Matrix& m) {
     return true;
 }
 
-bool Matrix::operator!=(Matrix& m) {
+bool Matrix::operator!=(Matrix const &m) {
     return !(this->operator==(m));
 }
 
-Matrix& Matrix::operator=(Matrix &m){
-    this->~Matrix();
-
-    _rows = m._rows, _cols = m._cols;
-    int *tmp = new int [_rows * _cols];
-    _data = new int *[_rows];
-    for (size_t  i = 0; i < _rows; i++)
-        _data[i] = tmp + i * _cols;
-    
-    memcpy(_data[0], m._data[0], _rows * _cols * sizeof(int));
-
+Matrix& Matrix::operator=(Matrix const &m){
+    if (*this != m) {
+        Matrix tmp(m);
+        this->swap(tmp);
+    }
     return *this;
 }
 
-Matrix& Matrix::operator+=(Matrix& m) {
+Matrix& Matrix::operator+=(Matrix const &m) {
     assert(m._rows == _rows && m._cols == _cols);
     for (size_t i = 0; i < _rows; i++)
         for (size_t j = 0; j < _cols; j++)
@@ -92,7 +88,7 @@ Matrix& Matrix::operator+=(Matrix& m) {
     return *this;
 }
 
-Matrix& Matrix::operator-=(Matrix& m) {
+Matrix& Matrix::operator-=(Matrix const &m) {
     assert(m._rows == _rows && m._cols == _cols);
     for (size_t i = 0; i < _rows; i++)
         for (size_t j = 0; j < _cols; j++)
@@ -100,33 +96,41 @@ Matrix& Matrix::operator-=(Matrix& m) {
     return *this;
 }
 
-Matrix& Matrix::operator*=(Matrix& m) {
+Matrix& Matrix::operator*=(Matrix const &m) {
     assert(m._rows == _cols);
     Matrix ret(_rows, m._cols);
     for (size_t i = 0; i < _rows; i++)
         for (size_t j = 0; j < _cols; j++)
             for (size_t k = 0; k < m._cols; k++)
                 ret._data[i][k] += _data[i][j] * m._data[j][k];
-    for (size_t i = 0; i < _rows; i++)
-        for (size_t j = 0; j < _cols; j++)
-            _data[i][j] = ret._data[i][j];
+
+    this->swap(ret);
+
     return *this;
 }
 
-Matrix Matrix::operator+(Matrix& m) {
+Matrix Matrix::operator+(Matrix const &m) {
     Matrix ret(*this);
     ret.operator+=(m);
     return ret;
 }
 
-Matrix Matrix::operator-(Matrix& m) {
+Matrix Matrix::operator-(Matrix const &m) {
     Matrix ret(*this);
     ret.operator-=(m);
     return ret;
 }
 
-Matrix Matrix::operator*(Matrix& m) {
+Matrix Matrix::operator*(Matrix const &m) {
     Matrix ret(*this);
     ret.operator*=(m);
     return ret;
+}
+
+
+void Matrix::swap(Matrix &m){
+    std::swap(m._data, _data);
+    std::swap(m._cols, _cols);
+    std::swap(m._rows, _rows);
+    return;
 }
