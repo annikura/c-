@@ -31,10 +31,10 @@ Matrix::Matrix(Matrix const &m) {
     memcpy(_data[0], m._data[0], _rows * _cols * sizeof(int));
 }
 
-std::size_t Matrix::get_rows() {
+std::size_t Matrix::get_rows() const{
     return _rows;
 }
-std::size_t Matrix::get_cols() {
+std::size_t Matrix::get_cols() const{
     return _cols;
 }
 
@@ -44,12 +44,12 @@ void Matrix::set(std::size_t i, std::size_t j, int val) {
     return;
 }
 
-int Matrix::get(std::size_t i, std::size_t j) {
+int Matrix::get(std::size_t i, std::size_t j) const{
     assert(i >= 0 && i < _rows && j >= 0 && j < _cols);
     return _data[i][j];
 }
 
-void Matrix::print(FILE* f) {
+void Matrix::print(FILE* f) const{
     for (size_t i = 0; i < _rows; i++) {
         for (size_t j = 0; j < _cols; j++)
             fprintf(f, "%d ", _data[i][j]);
@@ -58,7 +58,7 @@ void Matrix::print(FILE* f) {
 
 }
 
-bool Matrix::operator==(Matrix const &m) {
+bool Matrix::operator==(Matrix const &m) const{
     if (_rows != m._rows || _cols != m._cols)
         return false;
     for (size_t i = 0; i < _rows; i++)
@@ -68,7 +68,7 @@ bool Matrix::operator==(Matrix const &m) {
     return true;
 }
 
-bool Matrix::operator!=(Matrix const &m) {
+bool Matrix::operator!=(Matrix const &m) const{
     return !(this->operator==(m));
 }
 
@@ -109,19 +109,19 @@ Matrix& Matrix::operator*=(Matrix const &m) {
     return *this;
 }
 
-Matrix Matrix::operator+(Matrix const &m) {
+Matrix Matrix::operator+(Matrix const &m) const{
     Matrix ret(*this);
     ret.operator+=(m);
     return ret;
 }
 
-Matrix Matrix::operator-(Matrix const &m) {
+Matrix Matrix::operator-(Matrix const &m) const{
     Matrix ret(*this);
     ret.operator-=(m);
     return ret;
 }
 
-Matrix Matrix::operator*(Matrix const &m) {
+Matrix Matrix::operator*(Matrix const &m) const{
     Matrix ret(*this);
     ret.operator*=(m);
     return ret;

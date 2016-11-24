@@ -10,15 +10,15 @@ public:
     Matrix(Matrix const &m);
     ~Matrix();
 
-    std::size_t get_rows();
-    std::size_t get_cols();
+    std::size_t get_rows() const;
+    std::size_t get_cols() const;
     void set(std::size_t i, std::size_t j, int val);
-    int get(std::size_t i, std::size_t j);
-    void print(FILE *f);
+    int get(std::size_t i, std::size_t j) const;
+    void print(FILE *f) const;
 
-    Matrix operator+(Matrix const &m);
-    Matrix operator-(Matrix const &m);
-    Matrix operator*(Matrix const &m);
+    Matrix operator+(Matrix const &m) const;
+    Matrix operator-(Matrix const &m) const;
+    Matrix operator*(Matrix const &m) const;
 
     Matrix& operator=(Matrix const &m);
 
@@ -28,8 +28,9 @@ public:
     Matrix& operator-=(Matrix const &m);
     Matrix& operator*=(Matrix const &m);
 
-    bool operator==(Matrix const &m);
-    bool operator!=(Matrix const &m);
+    bool operator==(Matrix const &m) const;
+    bool operator!=(Matrix const &m) const;
+
 private:
     std::size_t _rows;
     std::size_t _cols;
