@@ -5,56 +5,68 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <list>
 #include <set>
 #include <algorithm>
 
-class HuffmanStructure {
-private:
-	std::size_t encode_table_size, code_size;
-	std::map <std::string, char> decode_table;
-	std::map <char, std::string> encode_table;
-	std::map <char, size_t> frequency_table;
-
-public:
-	void readTable(std::ifstream & in);
-	void readNCount(std::ifstream & in);
-	
-	void buildTree();
-	
-	void decodeNWrite(std::ifstream & in, std::ofstream & out) const;
-	void encodeNWrite(std::ifstream & in, std::ofstream & out);
-
-	void writeTable(std::ofstream & out) const;
-	void writeText(std::ifstream & in, std::ofstream & out);
-
-	std::size_t countCodeSize();
-	std::size_t getCodeSize();
-};
-
 
 class HuffmanNode {
-private:
-	bool is_leaf;
-	HuffmanNode *left, *right;
-	char symbol;
-	std::size_t count;
 public:
-	HuffmanNode() { };
-	HuffmanNode(char c, std::size_t cnt) : 
-		is_leaf(true), 
-		left(NULL), 
-		right(NULL),
-		symbol(c),
-		count(cnt) { }; 
+	HuffmanNode *left = nullptr, *right = nullptr;
+	char symbol;
+	int id;
+	std::uint32_t count;
 
-	void tie(HuffmanNode & l, HuffmanNode & r) {
-		count = l.count + r.count;
-		left = &l, right = &r;
-		is_leaf = false;
+	static int getId() {
+		static int id_var = 0;
+		return id_var++;
 	}
+
+public:
+	HuffmanNode() = default;
+	HuffmanNode(char c, std::uint32_t cnt);
+	
+	bool is_leaf() const;
+	char getLetter() const;
+	
+	HuffmanNode * improve(bool symbol) const;
+	void tie(HuffmanNode & l, HuffmanNode & r);
 	void descende(std::vector <char> & string, std::map <char, std::string> & table) const;
 	friend bool operator<(const HuffmanNode &, const HuffmanNode &);
 };
 
+bool operator<(const HuffmanNode & a, const HuffmanNode & b); 
 
-bool operator<(const HuffmanNode & a, const HuffmanNode & b);
+// ===== =====
+
+class HuffmanStructure {
+private:
+	std::uint32_t encode_table_size, code_size, text_size;
+	std::map <std::string, char> decode_table;
+	std::map <char, std::string> encode_table;
+	std::map <char, uint32_t> frequency_table;
+	std::list <HuffmanNode> v_storage;
+	HuffmanNode root;
+
+public:
+	HuffmanStructure() : encode_table_size(0),  code_size(0), text_size(0) { };
+	void readTable(std::ifstream & in);
+	void countFrequences(std::ifstream & in);
+	
+	void buildTree();
+
+	void decode(const std::string & file_in, const std::string & file_out);
+	void encode(const std::string & file_in, const std::string & file_out);
+	
+	void writeDecoded(std::ifstream & in, std::ofstream & out);
+	void writeEncoded(std::ifstream & in, std::ofstream & out);
+
+	void writeTable(std::ofstream & out) const;
+	void writeText(std::ifstream & in, std::ofstream & out) const;
+
+	std::uint32_t countCodeSize();
+	std::uint32_t getCodeSize() const;
+	std::uint32_t getTextSize() const;
+	std::uint32_t getTableSize() const;
+};
+

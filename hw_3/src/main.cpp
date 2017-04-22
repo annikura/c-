@@ -4,89 +4,75 @@
 #include <cstdlib>
 #include "huffman.h"
 
-using namespace std;
+struct ModeSpecifier{
+	enum class ActionType{ Undefined, Encode, Decode, Multiple };
+	ActionType type = ActionType::Undefined;
+	std::string iname, oname;
 
-struct arg_struct{
-	bool pack, unpack;
-	bool input, output;
-	string iname, oname;
-	arg_struct(){
-		pack = false, unpack = false;
-		input = false, output = false;
+	void validate(){
+		if (iname.empty() || oname.empty())
+			throw std::invalid_argument("At least one of the input/output file keys is absent.");
+		if (type == ModeSpecifier::ActionType::Undefined ||
+			type == ModeSpecifier::ActionType::Multiple)
+			throw std::invalid_argument("Enter ONE of the -u/-c keys");
+		if (iname == oname)
+			throw std::invalid_argument("input and output filenames should be different");
 	}
 };
 
-arg_struct readInput(int carg, const char ** varg){
-	arg_struct args; 
+ModeSpecifier parseArgs(int carg, const char ** varg){
+	ModeSpecifier args; 
 	for (int i = 1; i < carg; i++){
-		string arg = string(varg[i]);
+
+		std::string arg = static_cast<std::string>(varg[i]);
+		
 		if (arg == "-c"){
-			args.pack = true;
+			args.type = args.type == ModeSpecifier::ActionType::Undefined ?
+									 ModeSpecifier::ActionType::Encode :
+						 			 ModeSpecifier::ActionType::Multiple ;
 			continue;
 		}
 		if (arg == "-u"){
-			args.unpack = true;
+			args.type = args.type == ModeSpecifier::ActionType::Undefined ?
+									 ModeSpecifier::ActionType::Decode :
+						 			 ModeSpecifier::ActionType::Multiple ;
 			continue;
 		}
 		if (arg == "-f" || arg == "--file"){
-			if (i == carg - 1) throw invalid_argument("An argument after " + arg + " was expected.");
-			if (!args.input){
-				args.input = true;
-				args.iname = string(varg[++i]);
-			}
+			if (i == carg - 1) throw std::invalid_argument("An argument after " + arg + " was expected.");
+			args.iname = static_cast<std::string>(varg[++i]);
 			continue;
 		}
 		if (arg == "-o" || arg == "--output"){
-			if (i == carg - 1) throw invalid_argument("An argument after " + arg + " was expected.");
-			if (!args.output){
-				args.output = true;
-				args.oname = string(varg[++i]);
-			}
+			if (i == carg - 1) throw std::invalid_argument("An argument after " + arg + " was expected.");
+			args.oname = std::string(varg[++i]);
 			continue;
 		}
-		throw invalid_argument("Unknown argument " + arg + ".");
+
+		throw std::invalid_argument("Unknown argument " + arg + ".");
 	}
 	return args;
 }
 
-void checkArgs(const arg_struct & args){
-	if (!args.input || !args.output)
-		throw invalid_argument("At least one of the input/output keys is absent.");
-	if (args.pack == args.unpack)
-		throw invalid_argument("Choose ONE of the encode/decode options");
-	if (args.iname == args.oname)
-		throw invalid_argument("input and output filenames should be different");
-}
-
 int main(int carg, const char ** varg){
-	arg_struct args = readInput(carg, varg);
-	checkArgs(args);
-	HuffmanStructure huff_str;
-	if (args.unpack){
-		ifstream in (args.iname, ios::binary);
-		
-		huff_str.readTable(in);
-		huff_str.buildTree();
+	ModeSpecifier args = parseArgs(carg, varg);
+	args.validate();
 
-		ofstream out (args.oname, ios::binary);
-		huff_str.decodeNWrite(in, out);
+	HuffmanStructure huff_str;
+	if (args.type == ModeSpecifier::ActionType::Decode){
+		huff_str.decode(args.iname, args.oname);
 		
-		in.close();
-		out.close();
+		std::cout << huff_str.getCodeSize()  << std::endl
+			 	  << huff_str.getTextSize()  << std::endl
+			 	  << huff_str.getTableSize() << std::endl;
 		return 0;
 	}
-	if (args.pack){
-		ifstream in (args.iname);
+	if (args.type == ModeSpecifier::ActionType::Encode){
+		huff_str.encode(args.iname, args.oname);
 		
-		huff_str.readNCount(in);
-		huff_str.buildTree();
-
-		in.seekg(0, ios_base::beg);
-		ofstream out (args.oname);
-		huff_str.encodeNWrite(in, out);
-		
-		in.close();
-		out.close();
+		std::cout << huff_str.getTextSize()  << std::endl
+			 	  << huff_str.getCodeSize()  << std::endl
+			 	  << huff_str.getTableSize() << std::endl;
 		return 0;
 	}
 	return 1;

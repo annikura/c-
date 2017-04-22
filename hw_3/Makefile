@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -g -Wall -Wextra -Werror -Wshadow -fsanitize=undefined -D_GLIBCXX_DEBUG
+CFLAGS = -std=c++11 -g -Wall -Wextra -Wshadow -fsanitize=undefined -D_GLIBCXX_DEBUG
 
 main.cpp = src/main.cpp
 huffman.cpp = src/huffman.cpp
