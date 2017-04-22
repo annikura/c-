@@ -11,7 +11,7 @@
 
 
 class HuffmanNode {
-public:
+private:
 	HuffmanNode *left = nullptr, *right = nullptr;
 	char symbol;
 	int id;
@@ -29,7 +29,7 @@ public:
 	bool is_leaf() const;
 	char getLetter() const;
 	
-	HuffmanNode * improve(bool symbol) const;
+	HuffmanNode * advance(bool symbol) const;
 	void tie(HuffmanNode & l, HuffmanNode & r);
 	void descende(std::vector <char> & string, std::map <char, std::string> & table) const;
 	friend bool operator<(const HuffmanNode &, const HuffmanNode &);
@@ -42,31 +42,42 @@ bool operator<(const HuffmanNode & a, const HuffmanNode & b);
 class HuffmanStructure {
 private:
 	std::uint32_t encode_table_size, code_size, text_size;
-	std::map <std::string, char> decode_table;
-	std::map <char, std::string> encode_table;
-	std::map <char, uint32_t> frequency_table;
-	std::list <HuffmanNode> v_storage;
+	std::map<std::string, char> decode_table;
+	std::map<char, std::string> encode_table;
+	std::map<char, uint32_t> frequency_table;
+	std::list<HuffmanNode> v_storage;
 	HuffmanNode root;
 
 public:
 	HuffmanStructure() : encode_table_size(0),  code_size(0), text_size(0) { };
-	void readTable(std::ifstream & in);
-	void countFrequences(std::ifstream & in);
+	void readTable(std::istream & in);
+	void countFrequences(std::istream & in);
 	
 	void buildTree();
 
-	void decode(const std::string & file_in, const std::string & file_out);
-	void encode(const std::string & file_in, const std::string & file_out);
-	
-	void writeDecoded(std::ifstream & in, std::ofstream & out);
-	void writeEncoded(std::ifstream & in, std::ofstream & out);
+	void decode(std::istream & in, std::ostream & out);
+	void encode(std::istream & in, std::ostream & out);
 
-	void writeTable(std::ofstream & out) const;
-	void writeText(std::ifstream & in, std::ofstream & out) const;
+	void writeDecoded(std::istream & in, std::ostream & out);
+	void writeEncoded(std::istream & in, std::ostream & out);
+
+	void writeTable(std::ostream & out) const;
+	void writeText(std::istream & in, std::ostream & out) const;
 
 	std::uint32_t countCodeSize();
 	std::uint32_t getCodeSize() const;
 	std::uint32_t getTextSize() const;
 	std::uint32_t getTableSize() const;
+	const std::map<char, uint32_t> & getFrequencyTable() const {
+		return frequency_table;
+	}
+
+	const std::map<char, uint32_t> & getDecodeTable() const {
+		return decode_table;
+	}
+
+	const std::map<char, uint32_t> & getEncodeTable() const {
+		return encode_table;
+	}
 };
 

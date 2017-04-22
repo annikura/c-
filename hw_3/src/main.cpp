@@ -58,9 +58,15 @@ int main(int carg, const char ** varg){
 	ModeSpecifier args = parseArgs(carg, varg);
 	args.validate();
 
+	std::ios_base::sync_with_stdio(0);
+
+	std::ifstream in(args.iname);
+	std::ofstream out(args.oname);
+
 	HuffmanStructure huff_str;
 	if (args.type == ModeSpecifier::ActionType::Decode){
-		huff_str.decode(args.iname, args.oname);
+
+		huff_str.decode(in, out);
 		
 		std::cout << huff_str.getCodeSize()  << std::endl
 			 	  << huff_str.getTextSize()  << std::endl
@@ -68,7 +74,7 @@ int main(int carg, const char ** varg){
 		return 0;
 	}
 	if (args.type == ModeSpecifier::ActionType::Encode){
-		huff_str.encode(args.iname, args.oname);
+		huff_str.encode(in, out);
 		
 		std::cout << huff_str.getTextSize()  << std::endl
 			 	  << huff_str.getCodeSize()  << std::endl

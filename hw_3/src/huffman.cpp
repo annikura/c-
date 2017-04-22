@@ -4,46 +4,36 @@
 static const int ByteSize = 8;
 
 template <typename T>
-static void writeBinaryItem(std::ofstream & out, T obj){
+static void writeBinaryItem(std::ostream & out, T obj){
 	out.write(reinterpret_cast<char *>(&obj), sizeof(obj));
 }
 
 template <typename T>
-static void readBinaryItem(std::ifstream & in, T & obj){
+static void readBinaryItem(std::istream & in, T & obj){
 	in.read(reinterpret_cast<char *>(&obj), sizeof(obj));
 }
 
-void HuffmanStructure::decode(const std::string & file_in, const std::string & file_out){
-	std::ifstream in (file_in, std::ios::binary);
+void HuffmanStructure::decode(std::istream & in, std::ostream & out){
 	readTable(in);
 	buildTree();
 
-	std::ofstream out (file_out, std::ios::binary);
 	writeDecoded(in, out);
-	
-	in.close();
-	out.close();
 }
 
 
-void HuffmanStructure::encode(const std::string & file_in, const std::string & file_out){
-	std::ifstream in (file_in);
-	
+void HuffmanStructure::encode(std::istream & in, std::ostream & out){	
+	auto saved_pos = in.tellg();
 	countFrequences(in);
 	buildTree();
-	
-	in.close();
-	in.open(file_in);
 
-	std::ofstream out (file_out);
-	writeEncoded(in, out);
+	in.clear();
+	in.seekg(saved_pos, in.beg);
 	
-	in.close();
-	out.close();
+	writeEncoded(in, out);
 }
 
 
-void HuffmanStructure::readTable(std::ifstream & in) {
+void HuffmanStructure::readTable(std::istream & in) {
 	std::uint32_t table_size; 
 	char symbol;
 	std::uint32_t quantity;
@@ -58,7 +48,7 @@ void HuffmanStructure::readTable(std::ifstream & in) {
 	encode_table_size = sizeof(table_size) + table_size * (sizeof(symbol) + sizeof(quantity));
 }
 
-void HuffmanStructure::countFrequences(std::ifstream & in) {
+void HuffmanStructure::countFrequences(std::istream & in) {
 	char symbol;
 	while (in.get(symbol))
 		frequency_table[symbol]++, text_size++;
@@ -74,7 +64,10 @@ void HuffmanStructure::buildTree() {
 
 	for (auto i : frequency_table){
 		vertexes.insert(HuffmanNode(i.first, i.second));
+		if (frequency_table.size() == 1)
+			vertexes.insert(HuffmanNode(i.first, i.second));
 	}
+
 	while (vertexes.size() > 1){
 		left  = *vertexes.begin(), vertexes.erase(left);
 		right = *vertexes.begin(), vertexes.erase(right);
@@ -88,14 +81,16 @@ void HuffmanStructure::buildTree() {
 	root = *vertexes.begin();
 	std::vector <char> string;
 	root.descende(string, encode_table);
-	for (auto i : encode_table)
+	for (auto i : encode_table){
 		decode_table[i.second] = i.first;
+		
+	}
 	
 	countCodeSize();
 }
 
 
-void HuffmanStructure::writeDecoded(std::ifstream & in, std::ofstream & out) {
+void HuffmanStructure::writeDecoded(std::istream & in, std::ostream & out) {
 	std::uint32_t length, pos;
 	char code, code_char;
 	HuffmanNode * cur_node = &root;
@@ -107,7 +102,7 @@ void HuffmanStructure::writeDecoded(std::ifstream & in, std::ofstream & out) {
 		pos = i % ByteSize;
 		code_char = ((code >> pos) & 1);
 		
-		cur_node = cur_node->improve(code_char);
+		cur_node = cur_node->advance(code_char);
 
 		if (cur_node->is_leaf()){
 			out << cur_node->getLetter();
@@ -117,12 +112,12 @@ void HuffmanStructure::writeDecoded(std::ifstream & in, std::ofstream & out) {
 	}
 }
 
-void HuffmanStructure::writeEncoded(std::ifstream & in, std::ofstream & out) {
+void HuffmanStructure::writeEncoded(std::istream & in, std::ostream & out) {
 	writeTable(out);
 	writeText(in, out);
 }
 
-void HuffmanStructure::writeTable(std::ofstream & out) const {
+void HuffmanStructure::writeTable(std::ostream & out) const {
 	writeBinaryItem(out, static_cast<uint32_t>(decode_table.size()));
 	for (std::pair<char, uint32_t> i : frequency_table) {
 		writeBinaryItem(out, i.first);
@@ -130,7 +125,7 @@ void HuffmanStructure::writeTable(std::ofstream & out) const {
 	}
 }
 
-void HuffmanStructure::writeText(std::ifstream & in, std::ofstream & out) const {
+void HuffmanStructure::writeText(std::istream & in, std::ostream & out) const {
 	char symbol, to_record = 0;
 	std::size_t pos = 0;
 
@@ -161,7 +156,6 @@ std::uint32_t HuffmanStructure::countCodeSize() {
 std::uint32_t HuffmanStructure::getCodeSize() const {
 	return (code_size + ByteSize - 1) / ByteSize;
 }
-
 
 std::uint32_t HuffmanStructure::getTextSize() const {
 	return text_size;
@@ -196,7 +190,7 @@ bool operator<(const HuffmanNode & a, const HuffmanNode & b) {
 	return a.count < b.count || (a.count == b.count && a.id < b.id);	
 }
 
-HuffmanNode * HuffmanNode::improve(bool chr) const {
+HuffmanNode * HuffmanNode::advance(bool chr) const {
 	return (chr ? this->right : this->left);
 }
 
