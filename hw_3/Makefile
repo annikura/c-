@@ -13,10 +13,10 @@ test.o = bin/test.o
 main.o = bin/main.o
 huffman.o = bin/huffman.o
 
-all: main test
-
 main: bin $(main.o) $(huffman.o) 
 	$(CC) $(CFLAGS) $(main.o) $(huffman.o) -o main
+
+all: main test
 
 test: bin $(test.o) $(huffman.o)
 	$(CC) $(CFLAGS) $(test.o) $(huffman.o) -o test -lgtest
@@ -34,7 +34,7 @@ bin:
 	mkdir bin
 
 clean:
-	rm -rf bin main
+	rm -rf bin main test
 
 
 	

@@ -68,16 +68,5 @@ public:
 	std::uint32_t getCodeSize() const;
 	std::uint32_t getTextSize() const;
 	std::uint32_t getTableSize() const;
-	const std::map<char, uint32_t> & getFrequencyTable() const {
-		return frequency_table;
-	}
-
-	const std::map<char, uint32_t> & getDecodeTable() const {
-		return decode_table;
-	}
-
-	const std::map<char, uint32_t> & getEncodeTable() const {
-		return encode_table;
-	}
 };
 

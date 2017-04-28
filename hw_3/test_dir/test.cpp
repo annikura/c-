@@ -32,7 +32,6 @@ TEST_F(Fixture, testSimpleString){
 	mid.clear();
 	mid.seekg(0, mid.beg);
 	huff_str.decode(mid, out);
-	huff_str.code_size;
 	EXPECT_EQ(in.str(), out.str());
 }
 	
